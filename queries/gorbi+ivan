@@ -1,0 +1,5 @@
+dbr
+SELECT ?p ?c ?o {
+  dbr:Ivan_the_Terrible ?p ?o .
+  dbr:Mikhail_Gorbachev ?c ?o .
+}

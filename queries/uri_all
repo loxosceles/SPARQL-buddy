@@ -1,0 +1,5 @@
+dbo 
+SELECT * 
+  WHERE {
+  <http://dbpedia.org/resource/Estradasphere> ?p ?o
+  }

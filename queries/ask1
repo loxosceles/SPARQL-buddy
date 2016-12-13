@@ -1,0 +1,4 @@
+
+ASK { 
+  <http://dbpedia.org/resource/Estradasphere> ?p ?o
+  }

@@ -1,0 +1,6 @@
+dbr dbo dbp rdf
+SELECT ?population COUNT(?city) as ?city_count
+  WHERE {
+    dbr:Russia dbp:populationEstimate ?population .
+    ?city dbo:country dbr:Russia .
+  }

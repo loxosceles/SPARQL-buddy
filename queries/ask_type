@@ -1,0 +1,8 @@
+dbo rdf rdfs dbp
+ASK
+  WHERE {
+       ?searchterm rdf:type ?o  ;
+		          foaf:name ?name 
+	  FILTER(STR(?name) = "Alan Turing") .
+    
+  } 

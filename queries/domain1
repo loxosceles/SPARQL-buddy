@@ -1,0 +1,6 @@
+dbo rdf rdfs
+SELECT DISTINCT ?property ?range
+  WHERE {
+    ?property rdfs:domain dbo:Person . 
+    ?range    rdfs:range  dbo:Person .
+  }

@@ -1,0 +1,5 @@
+dbo
+SELECT ?o
+  WHERE {
+    <http://dbpedia.org/resource/Estradasphere> rdfs:subClassOf ?o .
+  }

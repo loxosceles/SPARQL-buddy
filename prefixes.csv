@@ -1,0 +1,13 @@
+dbo,<http://dbpedia.org/ontology/>
+dbp,<http://dbpedia.org/property>
+dbr,<http://dbpedia.org/resource/>
+owl,<http://www.w3.org/2002/07/owl#>
+rdf,<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+rdfs,<http://www.w3.org/2000/01/rdf-schema#>
+foaf,<http://xlns.com/foaf/0.1/>
+yago,<http://dbpedia.org/class/yago/>
+dc,<http://purl.org/dc/elemental/1.1/>
+card,<http://www.w3.org/People/Berners-Lee/card#>
+person,<http://w3id.org/scholarlydata/ontology/conference-ontology/owl#>
+xsd,<http://www.w3.org/2001/XMLSchema#>
+tto,<http://sparql-playground.sib.swiss/>

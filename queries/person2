@@ -1,0 +1,6 @@
+foaf dbo rdf rdfs
+SELECT Distinct ?type
+  Where { 
+    <http://dbpedia.org/resource/Edward_Snowden> rdf:type ?type .
+  } 
+

@@ -1,0 +1,10 @@
+dbr
+CONSTRUCT { 
+    dbr:Berlin ?p ?o .
+    ?s ?p2 dbr:Berlin .
+  } 
+  WHERE { 
+    { dbr:Berlin ?p ?o } 
+    UNION 
+    { ?s ?p2 dbr:Berlin }
+  } LIMIT 20

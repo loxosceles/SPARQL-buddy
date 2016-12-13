@@ -1,0 +1,117 @@
+""""
+Query 5 oder Query 6
+  
+SELECT ?location (COUNT(DISTINCT(?person)) AS ?num)
+  	WHERE {
+  		?location rdf:type yago:WikicatSkiAreasAndResortsInSwitzerland . 
+  		?location ^dbpedia:birthPlace ?person
+	} 
+GROUP BY ?location
+LIMIT 10
+
+___________
+
+Query 7
+  
+SELECT ?person ?dateOfBirth
+  	WHERE {
+  		?location rdf:type yago:WikicatSkiAreasAndResortsInSwitzerland . 
+  		?person dbpedia:birthPlace ?location .	
+		?person dbpedia:dateOfBirth ?dateOfBirth .
+	} 
+GROUP BY ?person
+LIMIT 10
+
+___________
+
+q2 = dbo + rdf + dbpprop + yago + """
+    SELECT ?location (COUNT(DISTINCT(?person)) AS ?num)
+            WHERE {
+                    ?location rdf:type yago:WikicatSkiAreasAndResortsInSwitzerland . 
+                    ?location ^dbpedia:birthPlace ?person
+            } 
+    GROUP BY ?location
+    LIMIT 10
+    """
+
+# Find the movies, starring by Julia Roberts, where there is no information about director.
+
+# Paging: Retrieve the second page of names and emails of people in Tim Berners-Lee's FOAF file,
+# given that each page has 10 people.
+# Use: FROM http://www.w3.org/People/Berners-Lee/card
+que7 = bl_card + foaf + """
+SELECT ?name
+   WHERE {
+	?name foaf:knows "Tim Berners-Lee" . 
+    }
+"""
+
+# Collect the statistics about Russia: find the population, total number of cities, number of ci
+
+# Find all landlocked countries (yago:WikicatLandlockedCountries) with a population greater
+# than 15 million (revisited), with the highest population country first.
+que6 = dbpprop + yago + """
+SELECT ?country ?population
+    WHERE {
+	?country rdf:type yago:WikicatLandlockedCountries .
+	?country prop:populationEstimate ?population .
+	FILTER (?population > 15000000)
+    } ORDER BY DESC(?population)
+"""
+
+que8a = """
+PREFIX prop: <http://dbpedia.org/property/>
+ASK {
+    <http://dbpedia.org/resource/Amazon_River> prop:length ?amazon .
+    <http://dbpedia.org/resource/Nile> prop:length ?nile .
+    FILTER(?amazon > ?nile) .
+}   
+
+sc1 = dbo + dbp + foaf + """
+SELECT DISTINCT ?name ?band ?bandname
+   WHERE {
+       ?person foaf:name ?name .
+       ?band dbo:bandMember ?person .
+       ?bandname foaf:name ?band .
+       #?band dbo:genre dbp:Punk_rock .
+       #?bandname foaf:name ?band .
+       #FILTER (STR(?bandname) = "Percocettes")
+}
+"""
+
+band = dbo + dbp + foaf + """
+SELECT DISTINCT ?band ?members
+    WHERE {
+	?band rdf:type dbo:Band .
+    }
+"""
+
+sat = dbo + dbp + """
+dbp:Pluto dbo:hasSaltellite dbp:Hydra_(moon),
+	dbp:Nyx_(moon),
+	dbp:Charon_(moon) .
+"""
+
+g2 = sd_person + sd_conf + """
+SELECT * 
+    WHERE {
+        ?s ?p ?o .
+      #?paper a conf:InProceedings;
+      #  conf:hasAuthorList ?authorList;
+      #  conf:title ?title . 
+      #?authorList conf:hasFirstItem ?item .
+      #?item conf:hasContent ?person .
+      #?person conf:name ?name
+    }
+"""
+q10 = rdf + rdfs + dbo + dbpprop + """
+     SELECT ?author ?title ?date
+     WHERE {
+     ?author rdf:type dbo:Writer .
+     ?author dbo:notableWork ?work .
+     ?work dbpprop:releaseDate ?date .
+     ?work rdfs:label ?title
+     FILTER (LANG(?title) = "en")
+     } ORDER BY ?date
+     LIMIT 100
+     """

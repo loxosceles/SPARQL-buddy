@@ -1,0 +1,14 @@
+dbp dbo tto
+SELECT ?name ?petname ?petsex ?petcolor ?petweight ?pettype
+  WHERE {
+    ?person a dbo:Person .
+    ?person dbp:name ?name
+    Optional {
+      ?person tto:pet _:b .
+      _:b dbp:name ?petname .
+      _:b tto:color ?petcolor .
+      _:b tto:sex ?petsex .
+      _:b tto:weight ?petweight .
+      _:b a ?pettype .
+    }
+  }
