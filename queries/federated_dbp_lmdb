@@ -1,0 +1,13 @@
+owl dc rdfs lmdb
+SELECT ?film ?label ?subject 
+  WHERE {
+    SERVICE <http://data.linkedmdb.org/sparql> {
+      ?film a lmdb:film .
+      ?film rdfs:label ?label .
+      ?film owl:sameAs ?dbpediaLink
+      FILTER regex(STR(?dbpediaLink), "dbpedia", "i")
+    }
+    SERVICE <http://dbpedia.org/sparql> {
+      ?dbpediaLink dcterms:subject ?subject .
+    }
+  } LIMIT 100

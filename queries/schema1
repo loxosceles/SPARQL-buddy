@@ -1,0 +1,7 @@
+schema dbo dbr
+SELECT ?type ?others
+  WHERE  { 
+    dbr:Estradasphere rdf:type ?type
+    FILTER REGEX(STR(?type), "http://schema.org") .
+    ?type rdf:isSimilarTo ?others . 
+  } LIMIT 20

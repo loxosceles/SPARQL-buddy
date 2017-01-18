@@ -1,0 +1,10 @@
+dbr rdf
+SELECT COUNT(?o) SAMPLE(?movie)
+  #FROM <http://en.dbpedia.org>
+    WHERE {
+      dbr:A_Trip_to_the_Moon ?p ?o .
+      ?movie rdf:type dbo:Film ;
+             ?p ?o .
+      FILTER (?movie != dbr:A_Trip_to_the_Moon).
+  } GROUP BY ?movie
+ORDER BY DESC(COUNT(?o))

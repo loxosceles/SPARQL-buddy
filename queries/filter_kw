@@ -1,7 +1,8 @@
 dbo rdf rdfs dbp
-ASK
+#ASK
+SELECT ?type ?name 
   WHERE {
-       ?searchterm rdf:type ?o  ;
+       ?uri rdf:type ?type  ;
 		          foaf:name ?name 
 	  FILTER(STR(?name) = "Alan Turing") .
     

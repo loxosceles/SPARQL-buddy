@@ -23,7 +23,10 @@ class SQuery:
     def generate_prefix_dict(self, pf):
         with open(pf, mode='r') as infile:
             tmp = csv.reader(infile)
-            self.prefixes_dict = {rows[0]:rows[1] for rows in tmp}
+            try:
+                self.prefixes_dict = {rows[0]:rows[1] for rows in tmp}
+            except IndexError as e:
+                sys.exit("Prefixes file should not contain blank lines")
 
     def set_url(self, url):
         self.url = url
@@ -54,19 +57,26 @@ class SQuery:
         return prefix_sting + query
 
 
-    def run_query(self, inpt):
+    def run_query(self, inpt, r="", kw=""):
+        """
+        runs a query
+        params: inpt, can be file or string
+                r, 'raw' prints raw JSON format
+        """
         q = self.compose_query(inpt)
         self.g.setReturnFormat(JSON)
         self.g.setQuery(q)
-        self.qres = self.g.query().convert()
-        self.print_query()
+        qres = self.g.query().convert()
+        if r is "raw":
+            self.print_query(qres, True)
+        else:
+            self.print_query(qres, False)
 
-    def print_query(self):
-        #print(json.dumps(self.qres["results"]["bindings"], indent=4, sort_keys=True))
-        print(json.dumps(self.qres, indent=4, sort_keys=True))
-
-    def print_raw_query(self):
-        print(self.qres)
+    def print_query(self, qres, raw):
+        if raw == True:
+            print(qres)
+        else:
+            print(json.dumps(qres, indent=4, sort_keys=True))
 
     def concat_prefix_string(self, prefix):
         return "PREFIX " + prefix + ": " + self.prefixes_dict[prefix] + " "

@@ -6,8 +6,14 @@ rdf,<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 rdfs,<http://www.w3.org/2000/01/rdf-schema#>
 foaf,<http://xlns.com/foaf/0.1/>
 yago,<http://dbpedia.org/class/yago/>
+skos,<http://www.w3.org/2004/02/skos/core#>
 dc,<http://purl.org/dc/elemental/1.1/>
 card,<http://www.w3.org/People/Berners-Lee/card#>
 person,<http://w3id.org/scholarlydata/ontology/conference-ontology/owl#>
 xsd,<http://www.w3.org/2001/XMLSchema#>
 tto,<http://sparql-playground.sib.swiss/>
+lmdb,<http://data.linkedmdb.org/resource/movie/>
+vrank,<http://purl.org/voc/vrank#>
+umbel-sc,<http://umbel.org/umbel/sc/>
+dydra,<https://dydra.com/danbri/schema-org/sparql>
+schema,<http://schema.org/>
