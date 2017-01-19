@@ -18,7 +18,7 @@ class SQObject:
     def query(self): 
         return self._query
 
-    @query_setter
+    @query.setter
     def query(self, value):
         self._query = value
 
@@ -26,16 +26,15 @@ class SQObject:
     def response(self): 
         return self._response
 
-    @response_setter
+    @response.setter
     def response(self, value):
         self._response = value
 
-#    def print_query(self, qres, raw):
-#        if raw == True:
-#            print(qres)
-#        else:
-#            print(json.dumps(qres, indent=4, sort_keys=True))
+    def print_query(self):
+        print(json.dumps(self.response, indent=4, sort_keys=True))
 
+    def print_raw_query(self):
+        print(self.response)
 
 class SQuery:
     """
@@ -67,13 +66,12 @@ class SQuery:
         obj = SQObject()
         obj.query = self.compose_query(inpt)
         self.g.setReturnFormat(JSON)
-        self.g.setQuery(q)
-        qres = self.g.query().convert()
+        self.g.setQuery(obj.query)
+        obj.response = self.g.query().convert()
         if r is "raw":
-            self.print_query(qres, True)
+            obj.print_raw_query()
         else:
-            self.print_query(qres, False)
-
+            obj.print_query()
 
     def compose_query(self, q):
         prefix_list = []
@@ -114,7 +112,7 @@ class SQuery:
     def concat_prefix_string(self, prefix):
         return "PREFIX " + prefix + ": " + self.prefixes_dict[prefix] + " "
 
-    def print_prefixes:
+    def print_prefixes():
         """
         TODO
         """
