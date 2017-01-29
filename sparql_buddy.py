@@ -4,6 +4,9 @@ import rdflib, json, csv, sys, traceback, fnmatch
 from SPARQLWrapper import SPARQLWrapper, JSON
 from os import walk, listdir
 import itertools
+import os, signal, time
+import threading
+#from pudb import set_trace; set_trace()
 
 default_url = "http://dbpedia.org/sparql"
 default_prefix_file = "./prefixes.csv"
@@ -16,6 +19,8 @@ class SQObject:
         self.id = id(self) 
         self.query = "" 
         self.response = dict()
+        self.keyword = ""
+        self.s_type = ""
 
     @property
     def query(self): 
@@ -33,8 +38,24 @@ class SQObject:
     def response(self, value):
         self._response = value
 
+    @property
+    def keyword(self):
+        return self._keyword
+
+    @keyword.setter
+    def keyword(self, value):
+        self._keyword = value
+
+    @property
+    def s_type(self):
+        return self._s_type
+
+    @s_type.setter
+    def s_type(self, value):
+        self._s_type = value
+
     def print_query(self):
-        print(self._query)
+        print("\n" + self._query)
 
     def print_response(self):
         print(json.dumps(self._response, indent=4, sort_keys=True))
@@ -45,6 +66,13 @@ class SQObject:
     def filter_types(self):
         for i in self.response['results']['bindings']:
             print(i['type']['value'])
+
+    def filter_attributes(self):
+        for i in self._response['results']['bindings']:
+            for j in i:
+                #print(self._response['results']['bindings'][i][j]['value'])
+                print(j + ": " + i[j]['value'])
+            print()
 
 
 class SQuery:
@@ -83,11 +111,13 @@ class SQuery:
         if r is "raw":
             obj.print_raw_response()
         else:
-            obj.print_response()
+            #obj.print_response()
+            obj.filter_attributes()
+            pass
 
     def compose_query(self, q):
         prefix_list = []
-        prefix_sting = ""
+        prefix_string = ""
         query = ""
 
         try:
@@ -106,25 +136,100 @@ class SQuery:
                     sys.exit('File name wrong?')
 
         for item in prefix_list:
-            prefix_sting + self.concat_prefix_string(item)
-        return prefix_sting + query
+            prefix_string = prefix_string + self.concat_prefix_string(item) + "\n"
+        return prefix_string + query
 
-    def keyword_search(self, kw):
-        kwq = """
-                SELECT DISTINCT ?searchterm ?type
-                    WHERE {
-                       ?searchterm rdf:type ?o  ;
-                       #foaf:name ?name
-                       rdfs:label ?name
-                        FILTER REGEX(?name, '%(keyword)s') .
-                        OPTIONAL {
-                            ?searchterm rdf:type ?type
-                            #FILTER REGEX(?type, "http://xmlns.com/foaf/0.1/Person") .
-                            #FILTER REGEX(?type, "http://xmlns.com/foaf/0.1/Agent") .
-                        } 
-                    } LIMIT 10
+    def handler(self, signum, frame):
+        raise Exception("Query timed out!")
+
+#    def status_bar(self,wt):
+#        
+#        clear = lambda: os.system('clear')
+#        clear() 
+#
+#        for i in range(wt + 1):
+#            print('|' + ((i + 1) * '#') + (((wt - 1) - i) * ' ') + '|')
+#            time.sleep(1)
+#            clear() 
+#        else:
+#            print()
+
+
+    def keyword_search(self, kw, strict=False):
+
+        strict_search = """foaf rdf rdfs
+                   SELECT ?place ?person ?action ?organization ?event ?name
+                   WHERE { 
+                           { 
+                           ?place rdf:type <http://schema.org/Place> ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?person rdf:type <http://schema.org/Person> ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?action rdf:type <http://schema.org/Action> ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?organization rdf:type <http://schema.org/Organization> ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?event rdf:type <http://schema.org/Event> ;
+                           rdfs:label ?name
+                           }
+
+                       FILTER (lang(?name) = "en")
+                       FILTER REGEX(?name, '^%(keyword)s$', 'i') .
+                   }
                 """ % {'keyword':kw}
-        self.run_query(kwq)
+
+        search = """foaf rdf rdfs
+                   SELECT ?place ?person ?action ?organization ?event ?name
+                   WHERE { 
+                           { 
+                           ?place rdf:type <http://schema.org/Place> ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?person rdf:type <http://schema.org/Person> ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?action rdf:type <http://schema.org/Action> ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?organization rdf:type <http://schema.org/Organization> ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?event rdf:type <http://schema.org/Event> ;
+                           rdfs:label ?name
+                           }
+
+                       FILTER (lang(?name) = "en")
+                       FILTER REGEX(?name, '^([A-z]+ )*%(keyword)s,?( [A-z]+)*$', 'i') .
+                       #FILTER REGEX(?name, '^%(keyword)s$', 'i') .
+                   }
+                """ % {'keyword':kw}
+
+        wait_time = 60
+        signal.signal(signal.SIGALRM, self.handler)
+
+        signal.alarm(wait_time)
+        #bar = threading.Thread(target=self.status_bar(wait_time))
+        #bar.start()
+        try:
+            if strict == True:
+                print('*---------------*')
+                print('| Strict Search |')
+                print('*---------------*')
+                self.run_query(strict_search)
+            else:
+                print('*-----------------*')
+                print('| Extended Search |')
+                print('*-----------------*')
+                self.run_query(search)
+            print('\n')
+        except Exception as e:
+            print(e)
+        signal.alarm(0)
+                
 
     def clear_query_list(self):
         self.query_list.clear()
@@ -140,6 +245,12 @@ class SQuery:
                 self.prefixes_dict = {rows[0]:rows[1] for rows in tmp}
             except IndexError as e:
                 sys.exit("Prefixes file should not contain blank lines")
+    
+    def print_last_query(self):
+        self.query_list[-1].print_query()
+
+    def print_last_response(self):
+        self.query_list[-1].print_response()
 
     def set_url(self, url):
         self.url = url
