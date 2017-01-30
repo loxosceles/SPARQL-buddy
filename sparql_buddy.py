@@ -14,7 +14,6 @@ default_query_path = "./queries/"
 
 
 class SQObject:
-    #newid = next(itertools.count())
     def __init__(self):
         self.id = id(self) 
         self.query = "" 
@@ -70,7 +69,6 @@ class SQObject:
     def filter_attributes(self):
         for i in self._response['results']['bindings']:
             for j in i:
-                #print(self._response['results']['bindings'][i][j]['value'])
                 print(j + ": " + i[j]['value'])
             print()
 
@@ -90,17 +88,17 @@ class SQuery:
         self.url = url
         self.prefix_file = prefixes
         self.dqp = dqp                              # default query path
-        #self.qres = dict() 
         self.g = SPARQLWrapper(self.url)
         self.prefixes_dict = dict() 
         self.generate_prefix_dict(self.prefix_file)
         self.query_list = []                        # list of recent query objects
+        #self.latest_qobj = self.latest_qobj() 
 
-    def run_query(self, inpt, r=""):
+    def run_query(self, inpt, fmt=""):
         """
         runs a query
         params: inpt, can be file or string
-                r, 'raw' prints raw JSON format
+                r, 'r' prints raw JSON format
         """
         obj = SQObject()
         obj.query = self.compose_query(inpt)
@@ -108,12 +106,15 @@ class SQuery:
         self.g.setQuery(obj.query)
         obj.response = self.g.query().convert()
         self.query_list.append(obj)
-        if r is "raw":
-            obj.print_raw_response()
-        else:
-            #obj.print_response()
-            obj.filter_attributes()
-            pass
+
+        if fmt is not 'boolean':
+            if fmt is "raw":
+                obj.print_raw_response()
+            elif fmt is "f":
+                print("debugging")
+                obj.filter_attributes()
+            else:
+                obj.print_response()
 
     def compose_query(self, q):
         prefix_list = []
@@ -155,58 +156,61 @@ class SQuery:
 #            print()
 
 
-    def keyword_search(self, kw, strict=False):
+    def keyword_search(self, kw, mode='extended'):
 
-        strict_search = """foaf rdf rdfs
+        strict_search = """foaf rdf rdfs schema
                    SELECT ?place ?person ?action ?organization ?event ?name
                    WHERE { 
                            { 
-                           ?place rdf:type <http://schema.org/Place> ;
+                           ?place rdf:type schema:Place ;
                            rdfs:label ?name
                            } UNION {
-                           ?person rdf:type <http://schema.org/Person> ;
+                           ?person rdf:type schema:Person ;
                            rdfs:label ?name
                            } UNION {
-                           ?action rdf:type <http://schema.org/Action> ;
+                           ?action rdf:type schema:Action ;
                            rdfs:label ?name
                            } UNION {
-                           ?organization rdf:type <http://schema.org/Organization> ;
+                           ?organization rdf:type schema:Organization ;
                            rdfs:label ?name
                            } UNION {
-                           ?event rdf:type <http://schema.org/Event> ;
+                           ?event rdf:type schema:Event ;
                            rdfs:label ?name
                            }
-
                        FILTER (lang(?name) = "en")
                        FILTER REGEX(?name, '^%(keyword)s$', 'i') .
                    }
                 """ % {'keyword':kw}
 
-        search = """foaf rdf rdfs
+        search = """foaf rdf rdfs schema
                    SELECT ?place ?person ?action ?organization ?event ?name
                    WHERE { 
                            { 
-                           ?place rdf:type <http://schema.org/Place> ;
+                           ?place rdf:type schema:Place ;
                            rdfs:label ?name
                            } UNION {
-                           ?person rdf:type <http://schema.org/Person> ;
+                           ?person rdf:type schema:Person ;
                            rdfs:label ?name
                            } UNION {
-                           ?action rdf:type <http://schema.org/Action> ;
+                           ?action rdf:type schema:Action ;
                            rdfs:label ?name
                            } UNION {
-                           ?organization rdf:type <http://schema.org/Organization> ;
+                           ?organization rdf:type schema:Organization ;
                            rdfs:label ?name
                            } UNION {
-                           ?event rdf:type <http://schema.org/Event> ;
+                           ?event rdf:type schema:Event ;
                            rdfs:label ?name
                            }
-
                        FILTER (lang(?name) = "en")
                        FILTER REGEX(?name, '^([A-z]+ )*%(keyword)s,?( [A-z]+)*$', 'i') .
-                       #FILTER REGEX(?name, '^%(keyword)s$', 'i') .
                    }
                 """ % {'keyword':kw}
+
+        quick = """dbr rdf rdfs 
+                    ASK {
+                    dbr:%(keyword)s ?p ?o .   
+                }
+                """ % {'keyword':kw.title().replace(" ", "_")}
 
         wait_time = 60
         signal.signal(signal.SIGALRM, self.handler)
@@ -215,16 +219,27 @@ class SQuery:
         #bar = threading.Thread(target=self.status_bar(wait_time))
         #bar.start()
         try:
-            if strict == True:
+            if mode == 'strict':
                 print('*---------------*')
                 print('| Strict Search |')
                 print('*---------------*')
                 self.run_query(strict_search)
-            else:
+            elif mode == 'extended':
                 print('*-----------------*')
                 print('| Extended Search |')
                 print('*-----------------*')
                 self.run_query(search)
+            elif mode == 'quick':
+                print('*--------------*')
+                print('| Quick Search |')
+                print('*--------------*')
+
+                self.run_query(quick, 'boolean')
+
+                if bool(self.query_list[-1].response['boolean']) is True:
+                    print("Success!")
+                    del self.query_list[-1]
+                
             print('\n')
         except Exception as e:
             print(e)
@@ -246,11 +261,15 @@ class SQuery:
             except IndexError as e:
                 sys.exit("Prefixes file should not contain blank lines")
     
-    def print_last_query(self):
-        self.query_list[-1].print_query()
+    def latest_qobj(self):
+        if self.query_list:
+            return self.query_list[-1] 
 
-    def print_last_response(self):
-        self.query_list[-1].print_response()
+    def print_latest_query(self):
+        tmp = self.latest_qobj().print_query()
+
+    def print_latest_response(self):
+        self.latest_qobj().print_response()
 
     def set_url(self, url):
         self.url = url
