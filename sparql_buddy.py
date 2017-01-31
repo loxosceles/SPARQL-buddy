@@ -216,10 +216,12 @@ class SQuery:
                 print('| Quick Search |')
                 print('*--------------*')
 
-                self.run_query(quick, 'boolean')
+                keyword = kw.title().replace(" ", "_ ")
+                q = quick % {'keyword':keyword}
+                self.run_query(q, 'boolean')
 
                 if bool(self.query_list[-1].response['boolean']) is True:
-                    print("<http://dbpedia.org/resource/%(kw)s>" % {'kw':kw.title().replace(" ", "_")})
+                    print("<http://dbpedia.org/resource/%(kw)s>" % {'kw':keyword}
                 else:
                     print("Not found")
 
