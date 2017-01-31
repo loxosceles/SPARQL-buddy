@@ -158,7 +158,7 @@ class SQuery:
 
     def keyword_search(self, kw, mode='extended'):
 
-        strict_search = """foaf rdf rdfs schema
+        sparql_q = """foaf rdf rdfs schema
                    SELECT ?place ?person ?action ?organization ?event ?name
                    WHERE { 
                            { 
@@ -178,33 +178,9 @@ class SQuery:
                            rdfs:label ?name
                            }
                        FILTER (lang(?name) = "en")
-                       FILTER REGEX(?name, '^%(keyword)s$', 'i') .
+                       FILTER REGEX(?name, %(regex)s) .
                    }
-                """ % {'keyword':kw}
-
-        search = """foaf rdf rdfs schema
-                   SELECT ?place ?person ?action ?organization ?event ?name
-                   WHERE { 
-                           { 
-                           ?place rdf:type schema:Place ;
-                           rdfs:label ?name
-                           } UNION {
-                           ?person rdf:type schema:Person ;
-                           rdfs:label ?name
-                           } UNION {
-                           ?action rdf:type schema:Action ;
-                           rdfs:label ?name
-                           } UNION {
-                           ?organization rdf:type schema:Organization ;
-                           rdfs:label ?name
-                           } UNION {
-                           ?event rdf:type schema:Event ;
-                           rdfs:label ?name
-                           }
-                       FILTER (lang(?name) = "en")
-                       FILTER REGEX(?name, '^([A-z]+ )*%(keyword)s,?( [A-z]+)*$', 'i') .
-                   }
-                """ % {'keyword':kw}
+                """ 
 
         quick = """dbr rdf rdfs 
                     ASK {
@@ -223,12 +199,18 @@ class SQuery:
                 print('*---------------*')
                 print('| Strict Search |')
                 print('*---------------*')
-                self.run_query(strict_search)
+
+                regex = "'^%(kw)s$', 'i'" % {'kw':kw}
+                q = sparql_q % {'regex':regex}
+                self.run_query(q)
             elif mode == 'extended':
                 print('*-----------------*')
                 print('| Extended Search |')
                 print('*-----------------*')
-                self.run_query(search)
+
+                regex = "'^([A-z]+ )*%(kw)s,?( [A-z]+)*$', 'i'" % {'kw':kw} 
+                q = sparql_q % {'regex':regex}
+                self.run_query(q)
             elif mode == 'quick':
                 print('*--------------*')
                 print('| Quick Search |')
@@ -237,8 +219,11 @@ class SQuery:
                 self.run_query(quick, 'boolean')
 
                 if bool(self.query_list[-1].response['boolean']) is True:
-                    print("Success!")
-                    del self.query_list[-1]
+                    print("<http://dbpedia.org/resource/%(kw)s>" % {'kw':kw.title().replace(" ", "_")})
+                else:
+                    print("Not found")
+
+                del self.query_list[-1]
                 
             print('\n')
         except Exception as e:
