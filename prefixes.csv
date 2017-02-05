@@ -15,5 +15,4 @@ xsd,<http://www.w3.org/2001/XMLSchema#>
 tto,<http://sparql-playground.sib.swiss/>
 lmdb,<http://data.linkedmdb.org/resource/movie/>
 vrank,<http://purl.org/voc/vrank#>
-umbel-sc,<http://umbel.org/umbel/sc/>
 dydra,<https://dydra.com/danbri/schema-org/sparql>

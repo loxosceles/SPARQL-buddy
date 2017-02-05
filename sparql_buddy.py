@@ -6,7 +6,6 @@ from os import walk, listdir
 import itertools
 import os, signal, time
 import threading
-#from pudb import set_trace; set_trace()
 
 default_url = "http://dbpedia.org/sparql"
 default_prefix_file = "./prefixes.csv"
@@ -200,8 +199,6 @@ class SQuery:
         signal.signal(signal.SIGALRM, self.handler)
 
         signal.alarm(wait_time)
-        #bar = threading.Thread(target=self.status_bar(wait_time))
-        #bar.start()
         try:
             if mode == 'strict':
                 print('*---------------*')
@@ -255,7 +252,7 @@ class SQuery:
         with open(self.prefix_file, mode='r') as infile:
             tmp = csv.reader(infile)
             try:
-                self.prefixes_dict = {rows[0]:rows[1] for rows in tmp}
+                return self.prefixes_dict = {rows[0]:rows[1] for rows in tmp}
             except IndexError as e:
                 sys.exit("Prefixes file should not contain blank lines")
     
@@ -281,11 +278,12 @@ class SQuery:
     def concat_prefix_string(self, prefix):
         return "PREFIX " + prefix + ": " + self.prefixes_dict[prefix] + " "
 
-    def print_prefixes():
+    def print_prefixes(self):
         """
-        TODO
+        Shows a list of prefixes and associated namespaces
         """
-        pass
+        for k, v in self.generate_prefixes_dict().items():
+            print('\t' + k + ':\t ' + v)
 
 def list_qfiles(*objs):
 
