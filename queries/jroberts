@@ -1,9 +1,0 @@
-dbo dbp rdf rdfs foaf
-
-SELECT ?actor ?name ?movie
-  WHERE {
-    ?actor rdf:type dbo:Actor .
-    ?movie dbo:starring ?actor .
-    ?name rdf:name ?actor
-    #FILTER(REGEX(?name) = "Julia Roberts") .
-  }

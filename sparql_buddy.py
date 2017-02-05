@@ -16,7 +16,9 @@ default_query_path = "./queries/"
 class SQObject:
     def __init__(self):
         self.id = id(self) 
+        self.name = ""
         self.query = "" 
+        self.rquery = "" 
         self.response = dict()
         self.keyword = ""
         self.s_type = ""
@@ -30,6 +32,14 @@ class SQObject:
         self._query = value
 
     @property
+    def rquery(self): 
+        return self._rquery
+
+    @rquery.setter
+    def rquery(self, value):
+        self._rquery = value
+
+    @property
     def response(self): 
         return self._response
 
@@ -41,7 +51,7 @@ class SQObject:
     def keyword(self):
         return self._keyword
 
-    @keyword.setter
+    @keyword.setter 
     def keyword(self, value):
         self._keyword = value
 
@@ -64,14 +74,15 @@ class SQObject:
 
     def filter_types(self):
         for i in self.response['results']['bindings']:
-            print(i['type']['value'])
+            for j in i:
+                print(j + ": " + i[j]['type'])
+            print()
 
     def filter_attributes(self):
         for i in self._response['results']['bindings']:
             for j in i:
                 print(j + ": " + i[j]['value'])
             print()
-
 
 class SQuery:
     """
@@ -90,9 +101,12 @@ class SQuery:
         self.dqp = dqp                              # default query path
         self.g = SPARQLWrapper(self.url)
         self.prefixes_dict = dict() 
-        self.generate_prefix_dict(self.prefix_file)
+        self.generate_prefix_dict()
         self.query_list = []                        # list of recent query objects
-        #self.latest_qobj = self.latest_qobj() 
+
+    def query_files(self): 
+        return dict(enumerate([f for f in listdir(self.dqp) 
+        if not fnmatch.filter(f, '.*')]))
 
     def run_query(self, inpt, fmt=""):
         """
@@ -101,18 +115,15 @@ class SQuery:
                 r, 'r' prints raw JSON format
         """
         obj = SQObject()
-        obj.query = self.compose_query(inpt)
+        obj.query, obj.rquery = self.compose_query(inpt)
         self.g.setReturnFormat(JSON)
         self.g.setQuery(obj.query)
-        obj.response = self.g.query().convert()
+        obj._response = self.g.query().convert()
         self.query_list.append(obj)
 
         if fmt is not 'boolean':
             if fmt is "raw":
                 obj.print_raw_response()
-            elif fmt is "f":
-                print("debugging")
-                obj.filter_attributes()
             else:
                 obj.print_response()
 
@@ -122,39 +133,36 @@ class SQuery:
         query = ""
 
         try:
+            # Assuming it is a immediate query:
+            # make list out of prefix abreviations
             prefix_list = q.split("\n", 1)[0].split()
+            # assign pure query to variable
             query = q.split("\n", 1)[1] 
         except (IndexError, AttributeError) as e:
+        # found out it was a index number and has to be read from file
             try:
-                if type(q) is int: q = list_queries()[q]
+                # if it is a number, so take name from query list
+                if type(q) is int: q = self.query_files()[q]
 
+                # prepend the relative path to query
                 q_relpath = self.dqp + q
 
                 with open(q_relpath) as f:
                     prefix_list = f.readline().strip().split()
                     query = f.read()
             except FileNotFoundError:
-                    sys.exit('File name wrong?')
+                # not a file, a number or a query name
+                sys.exit('File name wrong?')
 
+        # save the query with abreviated prefixes
+         
         for item in prefix_list:
             prefix_string = prefix_string + self.concat_prefix_string(item) + "\n"
-        return prefix_string + query
+        # return query twice: first with replaced prefixes, second without
+        return (prefix_string + query, ' '.join(prefix_list) + '\n' + query)
 
     def handler(self, signum, frame):
         raise Exception("Query timed out!")
-
-#    def status_bar(self,wt):
-#        
-#        clear = lambda: os.system('clear')
-#        clear() 
-#
-#        for i in range(wt + 1):
-#            print('|' + ((i + 1) * '#') + (((wt - 1) - i) * ' ') + '|')
-#            time.sleep(1)
-#            clear() 
-#        else:
-#            print()
-
 
     def keyword_search(self, kw, mode='extended'):
 
@@ -221,7 +229,7 @@ class SQuery:
                 self.run_query(q, 'boolean')
 
                 if bool(self.query_list[-1].response['boolean']) is True:
-                    print("<http://dbpedia.org/resource/%(kw)s>" % {'kw':keyword}
+                    print("<http://dbpedia.org/resource/%(kw)s>" % {'kw':keyword})
                 else:
                     print("Not found")
 
@@ -231,7 +239,10 @@ class SQuery:
         except Exception as e:
             print(e)
         signal.alarm(0)
-                
+    
+    def query2file(self, query, filename):
+        with open(self.dqp + filename, "w") as text_file:
+            text_file.write(query)
 
     def clear_query_list(self):
         self.query_list.clear()
@@ -240,20 +251,25 @@ class SQuery:
         for o in self.query_list:
             print(o)
 
-    def generate_prefix_dict(self, pf):
-        with open(pf, mode='r') as infile:
+    def generate_prefix_dict(self):
+        with open(self.prefix_file, mode='r') as infile:
             tmp = csv.reader(infile)
             try:
                 self.prefixes_dict = {rows[0]:rows[1] for rows in tmp}
             except IndexError as e:
                 sys.exit("Prefixes file should not contain blank lines")
     
-    def latest_qobj(self):
-        if self.query_list:
-            return self.query_list[-1] 
+    def latest_qobj(self, offset=1):
+        try:
+            return self.query_list[-int(offset)] 
+        except IndexError: 
+            print("No queries have been issued") 
 
     def print_latest_query(self):
-        tmp = self.latest_qobj().print_query()
+        try:
+            print(self.latest_qobj()._query)
+        except AttributeError:
+            print("Query list empty")
 
     def print_latest_response(self):
         self.latest_qobj().print_response()
@@ -271,9 +287,12 @@ class SQuery:
         """
         pass
 
+def list_qfiles(*objs):
 
-def list_queries(path=default_query_path):
-    return dict(enumerate([f for f in listdir(path) 
-        if not fnmatch.filter(f, '.*')]))
+    for i in objs:
+        print('\n' + i.url + '\n')
+        #print(i.query_files())
+        for k, v in i.query_files().items():
+            print('\t' + str(k) + ':\t' + v)
 
 sq = SQuery()
