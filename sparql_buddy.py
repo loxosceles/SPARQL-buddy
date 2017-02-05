@@ -99,9 +99,18 @@ class SQuery:
         self.prefix_file = prefixes
         self.dqp = dqp                              # default query path
         self.g = SPARQLWrapper(self.url)
-        self.prefixes_dict = dict() 
-        self.generate_prefix_dict()
-        self.query_list = []                        # list of recent query objects
+        self.prefix_mapping_dict = self.prefix_mapping() 
+        self.query_files_dict = self.query_files()
+        self.track_list = []                        # list of recent query objects
+
+    @property
+    def url(self):
+        return self._url
+
+    @url.setter
+    def url(self, url):
+        self._url = url
+        self.g = SPARQLWrapper(self._url)
 
     def query_files(self): 
         return dict(enumerate([f for f in listdir(self.dqp) 
@@ -118,7 +127,7 @@ class SQuery:
         self.g.setReturnFormat(JSON)
         self.g.setQuery(obj.query)
         obj._response = self.g.query().convert()
-        self.query_list.append(obj)
+        self.track_list.append(obj)
 
         if fmt is not 'boolean':
             if fmt is "raw":
@@ -141,7 +150,7 @@ class SQuery:
         # found out it was a index number and has to be read from file
             try:
                 # if it is a number, so take name from query list
-                if type(q) is int: q = self.query_files()[q]
+                if type(q) is int: q = self.query_files_dict[q]
 
                 # prepend the relative path to query
                 q_relpath = self.dqp + q
@@ -154,7 +163,6 @@ class SQuery:
                 sys.exit('File name wrong?')
 
         # save the query with abreviated prefixes
-         
         for item in prefix_list:
             prefix_string = prefix_string + self.concat_prefix_string(item) + "\n"
         # return query twice: first with replaced prefixes, second without
@@ -221,16 +229,17 @@ class SQuery:
                 print('| Quick Search |')
                 print('*--------------*')
 
-                keyword = kw.title().replace(" ", "_ ")
+                keyword = kw.title().replace(" ", "_")
                 q = quick % {'keyword':keyword}
                 self.run_query(q, 'boolean')
 
-                if bool(self.query_list[-1].response['boolean']) is True:
+                if bool(self.track_list[-1].response['boolean']) is True:
+                    #FIXME: hardcoded db-endpoint
                     print("<http://dbpedia.org/resource/%(kw)s>" % {'kw':keyword})
                 else:
                     print("Not found")
 
-                del self.query_list[-1]
+                del self.track_list[-1]
                 
             print('\n')
         except Exception as e:
@@ -241,24 +250,25 @@ class SQuery:
         with open(self.dqp + filename, "w") as text_file:
             text_file.write(query)
 
-    def clear_query_list(self):
-        self.query_list.clear()
+    def clear_track_list(self):
+        self.track_list.clear()
 
-    def print_query_list(self):
-        for o in self.query_list:
-            print(o)
+    def print_track_list(self):
+        print('\n')
+        for o in self.track_list:
+            print('id: ' + str(o.id))
 
-    def generate_prefix_dict(self):
+    def prefix_mapping(self):
         with open(self.prefix_file, mode='r') as infile:
             tmp = csv.reader(infile)
             try:
-                return self.prefixes_dict = {rows[0]:rows[1] for rows in tmp}
+                return {rows[0]:rows[1] for rows in tmp}
             except IndexError as e:
                 sys.exit("Prefixes file should not contain blank lines")
     
     def latest_qobj(self, offset=1):
         try:
-            return self.query_list[-int(offset)] 
+            return self.track_list[-int(offset)] 
         except IndexError: 
             print("No queries have been issued") 
 
@@ -271,26 +281,29 @@ class SQuery:
     def print_latest_response(self):
         self.latest_qobj().print_response()
 
-    def set_url(self, url):
-        self.url = url
-        self.g = SPARQLWrapper(self.url)
-
     def concat_prefix_string(self, prefix):
-        return "PREFIX " + prefix + ": " + self.prefixes_dict[prefix] + " "
+        try:
+            return "PREFIX " + prefix + ": " + self.prefix_mapping_dict[prefix] + " "
+        except:
+            print('Prefix not defined')
+            self.prefix_mapping_dict = self.prefix_mapping()
+            return "PREFIX " + prefix + ": " + self.prefix_mapping_dict[prefix] + " "
 
-    def print_prefixes(self):
+    def print_prefixes(self):
         """
         Shows a list of prefixes and associated namespaces
         """
-        for k, v in self.generate_prefixes_dict().items():
+        self.prefix_mapping_dict = self.prefix_mapping()
+        for k, v in self.prefix_mapping_dict.items():
             print('\t' + k + ':\t ' + v)
 
 def list_qfiles(*objs):
 
     for i in objs:
         print('\n' + i.url + '\n')
-        #print(i.query_files())
-        for k, v in i.query_files().items():
+        # making sure that the mappings will be written to a dict
+        i.query_files_dict = i.query_files()
+        for k, v in i.query_files_dict.items():
             print('\t' + str(k) + ':\t' + v)
 
 sq = SQuery()

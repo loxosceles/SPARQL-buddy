@@ -1,0 +1,4 @@
+import sparql_buddy as sb
+sq =sb.sq
+sp = sb.SQuery("http://foodpedia.tk/sparql", "./queries_grapheb/pf.csv", "./queries_grapheb/")
+

@@ -7,4 +7,4 @@ SELECT ?s ?name ?p
       OPTIONAL {
         ?s ?p ?o 
       }
-  } LIMIT 100
+  } LIMIT 10
