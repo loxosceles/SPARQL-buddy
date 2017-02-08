@@ -1,0 +1,23 @@
+foaf rdf rdfs schema
+                   SELECT ?place ?person ?action ?organization ?event ?name
+                   WHERE { 
+                           { 
+                           ?place rdf:type schema:Place ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?person rdf:type schema:Person ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?action rdf:type schema:Action ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?organization rdf:type schema:Organization ;
+                           rdfs:label ?name
+                           } UNION {
+                           ?event rdf:type schema:Event ;
+                           rdfs:label ?name
+                           }
+                       FILTER (lang(?name) = "en")
+                       FILTER REGEX(?name, '^([A-z]+ )*Barack Obama,?( [A-z]+)*$', 'i') .
+                   }
+                

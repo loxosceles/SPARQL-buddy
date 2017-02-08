@@ -1,0 +1,11 @@
+foaf dbo rdf rdfs
+SELECT DISTINCT ?person ?name ?asoc_info
+  WHERE { 
+    ?person rdf:type dbo:Person .
+    ?person rdfs:label ?name 
+    FILTER (LANG(?name) = "en") .
+    OPTIONAL {
+      ?person ?p ?asoc_info
+    }
+    FILTER (STR(?name) = "Edward Snowden") .
+  }

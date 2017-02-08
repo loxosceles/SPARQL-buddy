@@ -13,6 +13,11 @@ default_query_path = "./queries/"
 
 
 class SQObject:
+    """
+    Objects of this class hold a single query and all its 
+    associated information, like id, name, rquery (not 
+    abbreviated), query, response, type, etc.
+    """
     def __init__(self):
         self.id = id(self) 
         self.name = ""
@@ -94,10 +99,12 @@ class SQuery:
     If no parameters are given when instantiated, default values will be used.
     """
     
-    def __init__(self, url=default_url, prefixes=default_prefix_file, dqp=default_query_path):
+    def __init__(self, url=default_url, 
+                 prefixes=default_prefix_file,
+                 query_file_folder=default_query_path):
         self.url = url
         self.prefix_file = prefixes
-        self.dqp = dqp                              # default query path
+        self.query_file_folder = query_file_folder                              # default query path
         self.g = SPARQLWrapper(self.url)
         self.prefix_mapping_dict = self.prefix_mapping() 
         self.query_files_dict = self.query_files()
@@ -112,9 +119,19 @@ class SQuery:
         self._url = url
         self.g = SPARQLWrapper(self._url)
 
+    @property
+    def prefix_file(self):
+        return self._prefix_file
+
+    @prefix_file.setter
+    def prefix_file(self, path):
+        self._prefix_file = path
+
     def query_files(self): 
-        return dict(enumerate([f for f in listdir(self.dqp) 
+        self.query_files_dict = dict(enumerate(
+        [f for f in listdir(self.query_file_folder) 
         if not fnmatch.filter(f, '.*')]))
+        return self.query_files_dict
 
     def run_query(self, inpt, fmt=""):
         """
@@ -150,10 +167,12 @@ class SQuery:
         # found out it was a index number and has to be read from file
             try:
                 # if it is a number, so take name from query list
-                if type(q) is int: q = self.query_files_dict[q]
+                if type(q) is int:
+                    q = self.query_files_dict[q]
+                    print("Issuing " + q)
 
                 # prepend the relative path to query
-                q_relpath = self.dqp + q
+                q_relpath = self.query_file_folder + q
 
                 with open(q_relpath) as f:
                     prefix_list = f.readline().strip().split()
@@ -247,7 +266,7 @@ class SQuery:
         signal.alarm(0)
     
     def query2file(self, query, filename):
-        with open(self.dqp + filename, "w") as text_file:
+        with open(self.query_file_folder + filename, "w") as text_file:
             text_file.write(query)
 
     def clear_track_list(self):

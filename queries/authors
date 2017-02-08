@@ -8,4 +8,3 @@ rdf rdfs dbo dbp
       FILTER (LANG(?title) = "en") .
     } ORDER BY ?date
       LIMIT 100
-

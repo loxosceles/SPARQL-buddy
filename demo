@@ -1,4 +1,87 @@
 import sparql_buddy as sb
+
 sq =sb.sq
+
+sq.url
+sq.url = "bla"
+sq.url
+sq = sb.SQuery()
+sq.url = 'http://dbpedia.org/sparql'
+sq.url
+
+sq.query_file_folder
+
+sq.prefix_file
+
+sq.prefix_mapping_dict
+
+sq.query_files_dict
+
+sq.query_files()
+
+sq.run_query('edward')
+
+sq.track_list
+
+a = sq.latest_qobj()
+
+a.print_query()
+
+a.print_response()
+
+a.print_raw_response()
+
+a.filter_attributes()
+
+sq.query_files()
+
+sq.run_query(18)
+
+sq.run_query("""rdf rdfs dbo
+SELECT ?author ?title ?date ?work
+  WHERE {
+    ?author rdf:type dbo:Writer .
+    ?author dbo:notableWork ?work .
+    ?work dbo:releaseDate ?date .
+    ?work rdfs:label ?title
+    FILTER (LANG(?title) = "en") .
+  } ORDER BY ?date
+    LIMIT 10
+    OFFSET 90
+""")
+
+b = sq.latest_qobj()
+c = sq.latest_qobj(2)
+
+b.print_response()
+c.print_response()
+
+b.filter_attributes()
+c.filter_attributes()
+
 sp = sb.SQuery("http://foodpedia.tk/sparql", "./queries_grapheb/pf.csv", "./queries_grapheb/")
 
+sp.query_files()
+
+sp.run_query(0)
+
+sq.print_latest_query()
+sp.print_latest_query()
+sq.print_latest_response()
+sp.print_latest_response()
+
+sq.keyword_search("Barack Obama")
+
+sq.keyword_search("Barack Obama", "strict")
+
+sq.keyword_search("Trent Reznor", "quick")
+sq.keyword_search("Trent Rexnor", "quick")
+
+d = sq.latest_qobj()
+d.print_query()
+d.rquery
+sq.run_query(d.rquery)
+
+sq.query2file(sq.latest_qobj().rquery, "Obama")
+
+sb.list_qfiles(sp, sq)

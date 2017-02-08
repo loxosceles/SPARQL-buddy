@@ -1,0 +1,130 @@
+# import the script
+import sparql_buddy as sb
+
+# renaming to omit the module name
+sq =sb.sq
+
+# url, setter and getter
+sq.url
+sq.url = "bla"
+sq.url
+sq = sb.SQuery()
+sq.url = 'http://dbpedia.org/sparql'
+sq.url
+
+# path to folder where files are located
+sq.query_file_folder
+
+# path to file where prefixes are defined 
+sq.prefix_file
+
+# dictionary of prefixes and namespaces which gets created when object is created
+sq.prefix_mapping_dict
+
+# dictionary of files which gets created when object is created 
+sq.query_files_dict
+
+# list files
+sq.query_files()
+
+# run query from file
+sq.run_query('edward')
+
+# retrieve latest query object
+a = sq.latest_qobj()
+
+# print query text of that object
+a.print_query()
+
+# print response of that object
+a.print_response()
+
+# print raw response
+a.print_raw_response()
+
+# filter attributes
+a.filter_attributes()
+
+# list files again
+sq.query_files()
+
+# run same query by index number
+sq.run_query(18)
+
+# run immediate query
+sq.run_query("""rdf rdfs dbo
+  SELECT ?author ?title ?date ?work
+    WHERE {
+      ?author rdf:type dbo:Writer .
+      ?author dbo:notableWork ?work .
+      ?work dbo:releaseDate ?date .
+      ?work rdfs:label ?title
+      FILTER (LANG(?title) = "en") .
+    } ORDER BY ?date
+      LIMIT 10
+      OFFSET 90
+""")
+
+
+# run second immediate query
+sq.run_query("""rdf rdfs dbo
+  SELECT ?author ?title
+    WHERE {
+      ?author rdf:type dbo:Writer .
+      ?author dbo:notableWork ?work .
+      ?work dbo:releaseDate ?date .
+      ?work rdfs:label ?title
+      FILTER (LANG(?title) = "en") .
+    } ORDER BY ?date
+      LIMIT 10
+      OFFSET 90
+"""
+
+# get latest object
+b = sq.latest_qobj()
+# get last but one
+c = sq.latest_qobj(2)
+
+# compare b and c
+b.print_response()
+c.print_response()
+
+b.filter_attributes()
+c.filter_attributes()
+
+# create second environment, different params
+sp = sb.SQuery("http://foodpedia.tk/sparql", "./queries_grapheb/pf.csv", "./queries_grapheb/")
+
+# See if there are query files
+sp.query_files()
+
+# Query by index
+sp.run_query(0)
+
+# print latest query and response
+sq.print_latest_query()
+sp.print_latest_query()
+sq.print_latest_response()
+sp.print_latest_response()
+
+# keyword search (extended)
+sq.keyword_search("Barack Obama")
+
+# keyword search (strict)
+sq.keyword_search("Barack Obama", "strict")
+
+# keyword_search (quick) 
+sq.keyword_search("Trent Reznor", "quick")
+sq.keyword_search("Trent Rexnor", "quick")
+
+# insert rquery
+d = sq.latest_qobj()
+d.print_query()
+d.rquery
+sq.run_query(d.rquery)
+
+# write to file
+sq.query2file(sq.latest_qobj().rquery, "Obama")
+
+# show files for all query environments
+sb.list_qfiles(sp, sq)

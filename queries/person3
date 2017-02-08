@@ -1,7 +1,0 @@
-foaf dbo rdf owl
-SELECT Distinct ?p ?name
-  Where { 
-    ?p rdf:type dbo:Person .
-    ?p rdfs:label "Edward Snowden@en" .
-    #FILTER(STR(?name) = "Edward Snowden") .
-  }
