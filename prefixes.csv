@@ -1,11 +1,13 @@
 dbo,<http://dbpedia.org/ontology/>
 dbp,<http://dbpedia.org/property>
 dbr,<http://dbpedia.org/resource/>
+dbc,<http://dbpedia.org/category/>
 rdf,<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 rdfs,<http://www.w3.org/2000/01/rdf-schema#>
+wikidata,<http://wikiba.se/ontology-beta#>
 schema,<http://schema.org/>
 owl,<http://www.w3.org/2002/07/owl#>
-foaf,<http://xlns.com/foaf/0.1/>
+foaf,<http://xmlns.com/foaf/0.1/>
 yago,<http://dbpedia.org/class/yago/>
 skos,<http://www.w3.org/2004/02/skos/core#>
 dc,<http://purl.org/dc/elemental/1.1/>
@@ -16,3 +18,4 @@ tto,<http://sparql-playground.sib.swiss/>
 lmdb,<http://data.linkedmdb.org/resource/movie/>
 vrank,<http://purl.org/voc/vrank#>
 dydra,<https://dydra.com/danbri/schema-org/sparql>
+bc,<http://base22.com/ont/bc#>
