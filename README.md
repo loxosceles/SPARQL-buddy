@@ -1,13 +1,13 @@
 # SPARQL-Buddy
 ## Command line tool for querying SPARQL endpoints
-SPARQL-buddy is a customizable and extensible collection of python methods which take
-away the hassle of c&p queries into different web interfaces or GUIs for testing and
-tweaking your SPARQL queries on varying datasets. 
+SPARQL-Buddy is a customizable and extensible collection of python methods which
+offers an alternative to web interfaces and GUIs for writing, testing and tweaking your
+SPARQL queries on varying datasets.  
 
 This script also takes care of the complete setup and offers easy ways to change the
 configuration, save queries to text files without having to select a folder, change
 datasets on the fly and work with any number of them concurrently, compare responses,
-reuse them in different contexts, and so forth...
+reuse them in different contexts, shortcut namespace prefixes, and so forth...
 
 This is probably for you only if you feel more at home at your personalized CLI
 environment than in any web or GUI interface which all come with their very own
