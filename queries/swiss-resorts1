@@ -1,6 +1,0 @@
-rdf yago dbp
-SELECT ?location (COUNT(?person) AS ?p)
-  WHERE {
-    ?location rdf:type yago:WikicatSkiAreasAndResortsInSwitzerland .
-    ?person dbp:birthPlace ?location .
-  } GROUP BY ?location

@@ -1,8 +1,0 @@
-dbo dbp dbr
-SELECT ?population ?populated_place
-  WHERE {
-    ?populated_place a dbo:PopulatedPlace .
-    ?populated_place dbo:country dbr:Russia .
-    ?populated_place dbp:population ?population .
-    MINUS {dbr:MacKlintok_Island dbp:population ?population}
-  }

@@ -1,7 +1,0 @@
-dbo rdf owl
-SELECT DISTINCT ?type ?domain
-  WHERE { 
-    ?s rdf:type ?type .
-    ?domain rdfs:domain ?s .
-  } OFFSET 100
-    LIMIT 100

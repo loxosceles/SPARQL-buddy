@@ -1,7 +1,0 @@
-dbr dbo dbp rdf
-SELECT ?population COUNT(?city) as ?city_count
-  WHERE {
-    #dbr:Russia dbp:populationEstimate ?population .
-    #dbr:Russia umbel:PopulatedPlace ?population .
-    ?city dbo:country dbr:Russia .
-  }

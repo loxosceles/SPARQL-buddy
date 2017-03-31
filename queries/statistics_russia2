@@ -1,9 +1,0 @@
-dbr dbp dbo
-#SELECT COUNT(?megacity) as ?count
-SELECT ?megacity ?city_population
-  WHERE {
-    ?megacity a dbo:PopulatedPlace .
-    ?megacity dbo:country dbr:Russia .
-    ?megacity dbo:populationTotal ?city_population
-    FILTER(?city_population > 1000000) .  
-  }

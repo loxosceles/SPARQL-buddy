@@ -1,8 +1,0 @@
-dbo rdf vrank
-SELECT ?astronaut ?rank
-FROM <http://dbpedia.org>
-FROM <http://people.aifb.kit.edu/ath/#DBpedia_PageRank>
-  WHERE {
-    ?astronaut rdf:type dbo:Astronaut .
-    ?astronaut vrank:hasRank/vrank:rankValue ?rank .
-  } ORDER by DESC(?rank)

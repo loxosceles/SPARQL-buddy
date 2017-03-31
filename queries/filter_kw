@@ -1,9 +1,0 @@
-dbo rdf rdfs dbp
-#ASK
-SELECT ?type ?name 
-  WHERE {
-       ?uri rdf:type ?type  ;
-		          foaf:name ?name 
-	  FILTER(STR(?name) = "Alan Turing") .
-    
-  } 

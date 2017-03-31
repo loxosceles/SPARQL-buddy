@@ -1,9 +1,0 @@
-dbr
-SELECT ?s ?o
-  WHERE {
-    { 
-      dbr:Moscow ?p ?o . 
-    } UNION {
-      ?s ?p dbr:Moscow .
-    } 
-  } LIMIT 40

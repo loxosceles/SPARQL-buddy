@@ -1,8 +1,0 @@
-dbp rdfs yago rdf
-SELECT ?country_name ?population
-  WHERE {
-  ?country a yago:WikicatLandlockedCountries ;
-           rdfs:label ?country_name ;
-           dbp:populationEstimate ?population .
-           FILTER (?population > 15000000 && langMatches(lang(?country_name), "EN")) .
-  } ORDER BY DESC(?population)

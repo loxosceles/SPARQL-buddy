@@ -1,9 +1,0 @@
-dbo rdf rdfs dbp
-SELECT ?name ?type
-    WHERE {
-       ?scientist rdf:type dbo:Scientist ;
-		          foaf:name ?name 
-	  FILTER(STR(?name) = "Alan Turing") .
-       ?scientist rdf:type ?type .
-
-    } LIMIT 10
