@@ -10,8 +10,8 @@ datasets on the fly and work with any number of them concurrently, compare respo
 reuse them in different contexts, shortcut namespace prefixes, and so forth...
 
 This is probably for you only if you feel more at home at your personalized CLI
-environment than in any web or GUI interface which all come with their very own
-advantages and limitations. 
+environment than in any web or GUI interface which each of them comes with its very
+own advantages and limitations. 
 
 ### Setup
 Make sure the script is on your PYTHONPATH. From iPython:
