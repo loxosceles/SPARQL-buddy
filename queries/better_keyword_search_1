@@ -1,0 +1,10 @@
+
+SELECT ?s1 as ?c1, (bif:search_excerpt (bif:vector ('TRENT', 'REZNOR'), ?o1)) as ?c2
+    WHERE { 
+        quad map virtrdf:DefaultQuadMap 
+              { 
+                ?s1 ?s1textp ?o1 .
+                ?o1 bif:contains  '(TRENT AND REZNOR)' .
+    
+              }
+    } 
