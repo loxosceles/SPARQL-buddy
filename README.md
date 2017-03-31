@@ -18,9 +18,9 @@ Make sure the script is on your PYTHONPATH. From iPython:
 
     import sparql_buddy as sb
 
-Now your good to go. For convenience the script creates a first SPARQL query object.
-This object uses http://dbpedia.org as default endpoint. To make it easier to access
-I usually rename it:
+Now you're good to go. For convenience the script creates a first SPARQL query
+object. This object uses http://dbpedia.org/sparql as default endpoint. To make it
+easier to access I usually rename it:
 
     sq = sb.sq
 
