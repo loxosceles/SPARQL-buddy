@@ -1,5 +1,17 @@
-# SPARQL-buddy
+# SPARQL-Buddy
 ## Command line tool for querying SPARQL endpoints
+SPARQL-buddy is a customizable and extensible collection of python methods which take
+away the hassle of c&p queries into different web interfaces or GUIs for testing and
+tweaking your SPARQL queries on varying datasets. 
+
+This script also takes care of the complete setup and offers easy ways to change the
+configuration, save queries to text files without having to select a folder, change
+datasets on the fly and work with any number of them concurrently, compare responses,
+reuse them in different contexts, and so forth...
+
+This is probably for you only if you feel more at home at your personalized CLI
+environment than in any web or GUI interface which all come with their very own
+advantages and limitations. 
 
 ### Setup
 Make sure the script is on your PYTHONPATH. From iPython:
@@ -21,7 +33,7 @@ interface if you feel more comfortable with that.
 This quick introduction assumes that you will be following the examples using
 iPython.
 
-Check the default url and set a different one:
+Check the default URL and set a different one:
 
     sq.url    # 'http://dbpedia.org/sparql'
     sq.url = 'http://semantic.ckan.net/sparql/'
@@ -98,7 +110,7 @@ file.
 
 #### Working with queries
 You can retrieve the latest query object which holds the following information:
-- Query environment (url, prefix file path, query file folder path, ... )
+- Query environment (URL, prefix file path, query file folder path, ... )
 - Query
 - Response
 
@@ -208,7 +220,60 @@ super category) will be show as well. Currently there are the following categori
 
 Of course these categories could extended easily to embrace other types of entities.
 
+Reusing a past query (e.g. after editing it) is as simple as that:
+
+    sq.run_query(a.rquery)
+
 ##### 2. Strict search
-The strict search will only look for the given search term. The only modification it
-does does equally to the extended search is the replacing of one blank space with an
-underscore.
+The strict search will query the given search term without context. The only
+modification it does does equally to the extended search is the replacing of one
+blank space with an underscore.
+
+##### 3. Quick search
+Most of the times the result of the quick search is similar to the strict search. It
+exists mainly because of performance since it doesn't query all the categories but
+only checks if a URL for a given keyword exists. It is way faster since it fires only
+one 'ask' query instead of searching the whole dataset. 
+
+There are sometimes differences, though. For example, the keyword "Faith" doesn't
+belong to any of these categories, in fact, it lacks a schema.org category altogether
+(which is the vocabulary I'm using for that feature at the moment). As a consequence
+it pops up with quick search but not with strict search.
+
+#### Writing queries to file
+There is a method to write a query to a file which after that you will find inside
+your query folder.
+
+    sq.query2file(sq.latest_qobj().rquery, "Gandhi_2")
+    # Will write the lastest query you issued to the './query' folder under the name
+    "Gandhi_2"
+
+For quick editing you could fire `sq.query_files` to check the index and use it in
+the sq.run_query(`index`) method after editing the file. 
+
+<b>Note:</b> If you use a command line based file explorer like nerdTree for vim and
+manage your windows through Tmux or some similar setup you can edit and query very
+efficiently without ever leaving the terminal.
+
+#### Listing all saved queries
+Sometimes it is useful to list all your queries, also the ones which don't belong to
+the current query environment. This method is not part of any specific environment
+hence it is executed from the module level.
+
+This method takes one or more query objects (or environments) and lists their query
+folders so you get a quick overview of what do you have of saved queries in any of
+the environments.
+
+    sb.list_qfiles(`sq`, `obj1`, `...`)  # lists query file folder for sq and other
+                                         # enviromnents.
+
+### Collaborate
+This is just a very basic tool which helped me to understand and experiment with RDF
+and SPARQL in the context of Semantic Web. It is still work in progress and heavily
+adapted to my personal taste and workflow.
+
+Still, if your interested in (re-)using it, build a graphical interface around it or
+want to develop any feature you're missing, feel free to do so. I'd be delighted to
+get your feedback on that.
+
+loxosceles@gmx.de
