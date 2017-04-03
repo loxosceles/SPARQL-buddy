@@ -25,7 +25,7 @@ sq.prefix_mapping_dict
 sq.query_files_dict
 
 # list files
-sq.query_files()
+sq.query_files
 
 # run query from file
 sq.run_query('edward')
@@ -46,7 +46,7 @@ a.print_raw_response()
 a.filter_attributes()
 
 # list files again
-sq.query_files()
+sq.query_files
 
 # run same query by index number
 sq.run_query(18)
@@ -96,7 +96,7 @@ c.filter_attributes()
 sp = sb.SQuery("http://foodpedia.tk/sparql", "./queries_grapheb/pf.csv", "./queries_grapheb/")
 
 # See if there are query files
-sp.query_files()
+sp.query_files
 
 # Query by index
 sp.run_query(0)

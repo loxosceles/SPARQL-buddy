@@ -107,7 +107,7 @@ class SQuery:
         self.query_file_folder = query_file_folder                              # default query path
         self.g = SPARQLWrapper(self.url)
         self.prefix_mapping_dict = self.prefix_mapping() 
-        self.query_files_dict = self.query_files()
+        self.query_files_dict = self.query_files
         self.track_list = []                        # list of recent query objects
 
     @property
@@ -127,6 +127,7 @@ class SQuery:
     def prefix_file(self, path):
         self._prefix_file = path
 
+    @property
     def query_files(self): 
         self.query_files_dict = dict(enumerate(
         [f for f in listdir(self.query_file_folder) 
@@ -321,7 +322,7 @@ def list_qfiles(*objs):
     for i in objs:
         print('\n' + i.url + '\n')
         # making sure that the mappings will be written to a dict
-        i.query_files_dict = i.query_files()
+        i.query_files_dict = i.query_files
         for k, v in i.query_files_dict.items():
             print('\t' + str(k) + ':\t' + v)
 
